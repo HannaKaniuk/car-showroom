@@ -2,7 +2,7 @@
 
 Віртуальний автосалон — односторінковий застосунок на React з каталогом автомобілів, фільтрацією та системою відгуків.
 
-🔗 **Live demo:** https://hannakaniuk.github.io/car-showroom/
+🔗 **Live demo:** https://car-showroom-sand.vercel.app
 
 ## Опис проєкту
 
@@ -82,21 +82,16 @@ src/
 
 ## Деплой
 
-Застосунок розгорнуто на **GitHub Pages**: https://hannakaniuk.github.io/car-showroom/
+Застосунок розгорнуто на **Vercel**: https://car-showroom-sand.vercel.app
 
-Повторний деплой після змін:
-
-```bash
-./scripts/deploy-pages.sh
-```
+Проєкт підключено до GitHub — кожен push у `main` автоматично деплоїться.
 
 | Параметр | Значення |
 |----------|----------|
-| Build command | `VITE_BASE_PATH=/car-showroom/ npm run build` |
+| Build command | `npm run build` |
 | Output directory | `dist` |
-| Base path | `/car-showroom/` |
 
-Також підтримується розгортання на [Vercel](https://vercel.com) або [Netlify](https://netlify.com) — для SPA-маршрутизації налаштовано `vercel.json`, `netlify.toml` та `public/_redirects`.
+Для SPA-маршрутизації налаштовано `vercel.json`. Також є конфіги для [Netlify](https://netlify.com) (`netlify.toml`) та GitHub Pages (`scripts/deploy-pages.sh`).
 
 ## Автор
 
