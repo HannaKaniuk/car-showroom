@@ -1,16 +1,9 @@
 import { Link } from 'react-router-dom';
 import type { Vehicle } from '../types/vehicle';
+import { formatPrice, handleImageError } from '../utils/format';
 
 interface VehicleCardProps {
   vehicle: Vehicle;
-}
-
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat('uk-UA', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(price);
 }
 
 export function VehicleCard({ vehicle }: VehicleCardProps) {
@@ -30,6 +23,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
             alt={vehicle.title}
             className="vehicle-card__image"
             loading="lazy"
+            onError={handleImageError}
           />
         </figure>
         <div className="vehicle-card__body">

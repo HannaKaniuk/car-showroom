@@ -3,7 +3,6 @@ import { fetchVehicles } from '../api/vehicles';
 import { VehicleFilter, type VehicleFilters } from '../components/VehicleFilter';
 import { VehicleList } from '../components/VehicleList';
 import type { Vehicle } from '../types/vehicle';
-import { validateSearchQuery } from '../utils/validation';
 
 const defaultFilters: VehicleFilters = {
   query: '',
@@ -12,10 +11,9 @@ const defaultFilters: VehicleFilters = {
 };
 
 function filterAndSort(vehicles: Vehicle[], filters: VehicleFilters): Vehicle[] {
-  const hasQueryError = !!validateSearchQuery(filters.query).query;
-  const query = hasQueryError ? '' : filters.query.trim().toLowerCase();
+  const query = filters.query.trim().toLowerCase();
 
-  let result = vehicles.filter((vehicle) => {
+  const filtered = vehicles.filter((vehicle) => {
     const matchesBrand = !filters.brand || vehicle.brand === filters.brand;
     const matchesQuery =
       !query ||
@@ -26,7 +24,7 @@ function filterAndSort(vehicles: Vehicle[], filters: VehicleFilters): Vehicle[] 
     return matchesBrand && matchesQuery;
   });
 
-  result = [...result].sort((a, b) => {
+  return filtered.toSorted((a, b) => {
     switch (filters.sortBy) {
       case 'price-asc':
         return a.price - b.price;
@@ -39,21 +37,30 @@ function filterAndSort(vehicles: Vehicle[], filters: VehicleFilters): Vehicle[] 
         return a.title.localeCompare(b.title, 'uk');
     }
   });
-
-  return result;
 }
 
-export function HomePage() {
+interface VehicleCatalogProps {
+  onRetry: () => void;
+}
+
+function VehicleCatalog({ onRetry }: VehicleCatalogProps) {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [filters, setFilters] = useState<VehicleFilters>(defaultFilters);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchVehicles()
+    const controller = new AbortController();
+
+    fetchVehicles(controller.signal)
       .then(setVehicles)
-      .catch(() => setError('Не вдалося завантажити автомобілі'))
+      .catch((err: unknown) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setError('Не вдалося завантажити автомобілі');
+      })
       .finally(() => setLoading(false));
+
+    return () => controller.abort();
   }, []);
 
   const brands = useMemo(
@@ -77,11 +84,32 @@ export function HomePage() {
 
   if (error) {
     return (
-      <p className="status-message status-message--error" role="alert">
-        {error}
-      </p>
+      <div className="error-page">
+        <p className="status-message status-message--error" role="alert">
+          {error}
+        </p>
+        <button type="button" className="btn btn--secondary" onClick={onRetry}>
+          Спробувати знову
+        </button>
+      </div>
     );
   }
+
+  return (
+    <>
+      <VehicleFilter filters={filters} brands={brands} onChange={setFilters} />
+
+      <p className="results-count" role="status">
+        Знайдено: {filteredVehicles.length} з {vehicles.length}
+      </p>
+
+      <VehicleList vehicles={filteredVehicles} />
+    </>
+  );
+}
+
+export function HomePage() {
+  const [fetchKey, setFetchKey] = useState(0);
 
   return (
     <>
@@ -90,13 +118,7 @@ export function HomePage() {
         <p>Оберіть модель для детальної інформації та відгуків</p>
       </header>
 
-      <VehicleFilter filters={filters} brands={brands} onChange={setFilters} />
-
-      <p className="results-count" role="status">
-        Знайдено: {filteredVehicles.length} з {vehicles.length}
-      </p>
-
-      <VehicleList vehicles={filteredVehicles} />
+      <VehicleCatalog key={fetchKey} onRetry={() => setFetchKey((k) => k + 1)} />
     </>
   );
 }

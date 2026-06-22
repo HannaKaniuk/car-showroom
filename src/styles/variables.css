@@ -1,0 +1,32 @@
+:root {
+  --color-bg: #0c0c10;
+  --color-bg-soft: #131318;
+  --color-surface: #1a1a20;
+  --color-surface-hover: #222228;
+  --color-text: #f4f4f5;
+  --color-muted: #9ca3af;
+  --color-border: rgb(255 255 255 / 0.09);
+  --color-border-strong: rgb(255 255 255 / 0.15);
+  --color-primary: #60a5fa;
+  --color-primary-dim: rgb(96 165 250 / 0.15);
+  --color-primary-hover: #93c5fd;
+  --color-accent: #fbbf24;
+  --color-success: #4ade80;
+  --color-error: #f87171;
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 18px;
+  --shadow-sm: 0 2px 8px rgb(0 0 0 / 0.25);
+  --shadow: 0 16px 48px rgb(0 0 0 / 0.4);
+  --shadow-glow:
+    0 0 0 1px rgb(96 165 250 / 0.2), 0 16px 40px rgb(0 0 0 / 0.45);
+  --max-width: 1240px;
+  --gap: 1.25rem;
+  --font-body: "DM Sans", system-ui, -apple-system, sans-serif;
+  --font-display: "Outfit", "DM Sans", system-ui, sans-serif;
+  font-family: var(--font-body);
+  line-height: 1.55;
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}

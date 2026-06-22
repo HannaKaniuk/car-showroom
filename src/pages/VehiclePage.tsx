@@ -8,34 +8,48 @@ import { addLocalComment, getLocalComments } from '../utils/commentsStorage';
 import { mergeReviews } from '../utils/reviews';
 import type { LocalReview, Vehicle } from '../types/vehicle';
 
-export function VehiclePage() {
-  const { vehicleId } = useParams<{ vehicleId: string }>();
-  const id = Number(vehicleId);
+function InvalidVehicleMessage() {
+  return (
+    <div className="error-page">
+      <p className="status-message status-message--error" role="alert">
+        Невірний ідентифікатор автомобіля
+      </p>
+      <Link to="/" className="btn btn--secondary">
+        Повернутися до каталогу
+      </Link>
+    </div>
+  );
+}
 
+interface VehicleContentProps {
+  id: number;
+  onRetry: () => void;
+}
+
+function VehicleContent({ id, onRetry }: VehicleContentProps) {
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
-  const [localReviews, setLocalReviews] = useState<LocalReview[]>([]);
+  const [localReviews, setLocalReviews] = useState<LocalReview[]>(() => getLocalComments(id));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!vehicleId || Number.isNaN(id)) {
-      setError('Невірний ідентифікатор автомобіля');
-      setLoading(false);
-      return;
-    }
+    const controller = new AbortController();
 
-    setLocalReviews(getLocalComments(id));
-
-    fetchVehicleById(id)
+    fetchVehicleById(id, controller.signal)
       .then((data) => {
         if (data.category !== 'vehicle') {
           throw new Error('Not a vehicle');
         }
         setVehicle(data);
       })
-      .catch(() => setError('Автомобіль не знайдено'))
+      .catch((err: unknown) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setError('Автомобіль не знайдено');
+      })
       .finally(() => setLoading(false));
-  }, [vehicleId, id]);
+
+    return () => controller.abort();
+  }, [id]);
 
   const allReviews = useMemo(() => {
     if (!vehicle) return localReviews;
@@ -68,9 +82,14 @@ export function VehiclePage() {
         <p className="status-message status-message--error" role="alert">
           {error ?? 'Автомобіль не знайдено'}
         </p>
-        <Link to="/" className="btn btn--secondary">
-          Повернутися до каталогу
-        </Link>
+        <div className="error-page__actions">
+          <button type="button" className="btn btn--secondary" onClick={onRetry}>
+            Спробувати знову
+          </button>
+          <Link to="/" className="btn btn--secondary">
+            Повернутися до каталогу
+          </Link>
+        </div>
       </div>
     );
   }
@@ -92,5 +111,23 @@ export function VehiclePage() {
         <CommentList reviews={allReviews} />
       </section>
     </>
+  );
+}
+
+export function VehiclePage() {
+  const { vehicleId } = useParams<{ vehicleId: string }>();
+  const [fetchKey, setFetchKey] = useState(0);
+  const id = Number(vehicleId);
+
+  if (!vehicleId || Number.isNaN(id)) {
+    return <InvalidVehicleMessage />;
+  }
+
+  return (
+    <VehicleContent
+      key={`${id}-${fetchKey}`}
+      id={id}
+      onRetry={() => setFetchKey((k) => k + 1)}
+    />
   );
 }

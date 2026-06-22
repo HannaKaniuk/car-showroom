@@ -8,20 +8,6 @@ export interface FieldErrors {
   rating?: string;
 }
 
-export interface FilterFieldErrors {
-  query?: string;
-}
-
-export function validateSearchQuery(query: string): FilterFieldErrors {
-  const errors: FilterFieldErrors = {};
-
-  if (query.length > MAX_SEARCH_QUERY_LENGTH) {
-    errors.query = `Максимум ${MAX_SEARCH_QUERY_LENGTH} символів`;
-  }
-
-  return errors;
-}
-
 export function validateCommentForm(
   reviewerName: string,
   comment: string,

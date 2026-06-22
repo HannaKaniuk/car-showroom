@@ -1,15 +1,8 @@
-import type { LocalReview } from '../types/vehicle';
 import { getReviewKey, type DisplayReview } from '../utils/reviews';
+import { formatDate } from '../utils/format';
 
 interface CommentListProps {
   reviews: DisplayReview[];
-}
-
-function formatDate(date: string): string {
-  return new Intl.DateTimeFormat('uk-UA', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(date));
 }
 
 export function CommentList({ reviews }: CommentListProps) {
@@ -35,9 +28,7 @@ export function CommentList({ reviews }: CommentListProps) {
           <p className="comment__text">{review.comment}</p>
           <footer className="comment__footer">
             <time dateTime={review.date}>{formatDate(review.date)}</time>
-            {(review as LocalReview).local && (
-              <span className="comment__badge">Ваш коментар</span>
-            )}
+            {review.local && <span className="comment__badge">Ваш коментар</span>}
           </footer>
         </li>
       ))}

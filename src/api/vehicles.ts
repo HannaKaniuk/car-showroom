@@ -2,8 +2,8 @@ import type { Vehicle, VehiclesResponse } from '../types/vehicle';
 
 const BASE_URL = 'https://dummyjson.com';
 
-export async function fetchVehicles(): Promise<Vehicle[]> {
-  const response = await fetch(`${BASE_URL}/products/category/vehicle`);
+export async function fetchVehicles(signal?: AbortSignal): Promise<Vehicle[]> {
+  const response = await fetch(`${BASE_URL}/products/category/vehicle`, { signal });
 
   if (!response.ok) {
     throw new Error('Failed to load vehicles');
@@ -13,8 +13,8 @@ export async function fetchVehicles(): Promise<Vehicle[]> {
   return data.products;
 }
 
-export async function fetchVehicleById(id: number): Promise<Vehicle> {
-  const response = await fetch(`${BASE_URL}/products/${id}`);
+export async function fetchVehicleById(id: number, signal?: AbortSignal): Promise<Vehicle> {
+  const response = await fetch(`${BASE_URL}/products/${id}`, { signal });
 
   if (!response.ok) {
     throw new Error('Vehicle not found');
