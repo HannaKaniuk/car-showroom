@@ -82,15 +82,21 @@ src/
 
 ## Деплой
 
-Автоматичний деплой на **GitHub Pages** через GitHub Actions (`.github/workflows/deploy.yml`).
+Застосунок розгорнуто на **GitHub Pages**: https://hannakaniuk.github.io/car-showroom/
+
+Повторний деплой після змін:
+
+```bash
+./scripts/deploy-pages.sh
+```
 
 | Параметр | Значення |
 |----------|----------|
-| Build command | `npm run build` |
+| Build command | `VITE_BASE_PATH=/car-showroom/ npm run build` |
 | Output directory | `dist` |
-| Base path (Pages) | `/car-showroom/` |
+| Base path | `/car-showroom/` |
 
-Також підтримується розгортання на [Vercel](https://vercel.com) або [Netlify](https://netlify.com) — для SPA-маршрутизації вже налаштовано `vercel.json`, `netlify.toml` та `public/_redirects`.
+Також підтримується розгортання на [Vercel](https://vercel.com) або [Netlify](https://netlify.com) — для SPA-маршрутизації налаштовано `vercel.json`, `netlify.toml` та `public/_redirects`.
 
 ## Автор
 
